@@ -116,7 +116,7 @@ func main() {
 		case err := <-serverErrors:
 			exitOnError(fmt.Errorf("server error: %v", err.Error()))
 		case err := <-tail.Errors():
-			if err.Type() == fswatcher.FileNotFound || os.IsNotExist(err.Cause()) {
+			if (err.Type() == fswatcher.FileNotFound || err.Type() == fswatcher.DirectoryNotFound ) || os.IsNotExist(err.Cause()) {
 				exitOnError(fmt.Errorf("error reading log lines: %v: use 'fail_on_missing_logfile: false' in the input configuration if you want grok_exporter to start even though the logfile is missing", err))
 			} else {
 				exitOnError(fmt.Errorf("error reading log lines: %v", err.Error()))
