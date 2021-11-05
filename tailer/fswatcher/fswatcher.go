@@ -112,10 +112,21 @@ func runFileTailer(initFunc func() (fswatcher, Error), globs []glob.Glob, readal
 	var (
 		t   *fileTailer
 		Err Error
+		g   glob.Glob
 	)
 
+	var existingGlobs []glob.Glob
+
+	for _, g = range globs {
+		if _, err := os.Stat(g.Dir()); err == nil {
+			existingGlobs = append(existingGlobs, g)
+		} else if os.IsNotExist(err) {
+			fmt.Println("Skipped missing input", g)
+		}
+	}
+
 	t = &fileTailer{
-		globs:        globs,
+		globs:        existingGlobs,
 		watchedFiles: make(map[string]*fileWithReader),
 		lines:        make(chan *Line),
 		errors:       make(chan Error),
